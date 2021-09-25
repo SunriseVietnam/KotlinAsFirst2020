@@ -3,6 +3,7 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -76,7 +77,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
 fun digitNumber(n: Int): Int {
     var number = n
     var result = 1
-    while (number > 9) {
+    while (abs(number) > 9) {
         ++result
         number /= 10
     }
@@ -91,9 +92,9 @@ fun digitNumber(n: Int): Int {
  */
 fun fib(n: Int): Int {
     var result = 1
-    var previous = result
+    var previous = 1
     for (i in 1 until n - 1) {
-        val temp: Int = result
+        val temp = result
         result += previous
         previous = temp
     }
