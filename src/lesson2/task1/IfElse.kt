@@ -9,7 +9,7 @@ import kotlin.math.sqrt
 // Урок 2: ветвления (здесь), логический тип (см. 2.2).
 // Максимальное количество баллов = 6
 // Рекомендуемое количество баллов = 5
-// Вместе с предыдущими уроками = 9/12
+// Вместе с предыдущими уроками = 9/11
 
 /**
  * Пример
@@ -68,7 +68,19 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String {
+    return when (age % 100) {
+        11, 12, 13, 14 -> "$age лет"
+        else -> {
+            return when (age % 10) {
+                1 -> "$age год"
+                2, 3, 4 -> "$age года"
+                else -> "$age лет"
+            }
+        }
+    }
+
+}
 
 /**
  * Простая (2 балла)
@@ -132,4 +144,18 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    if (b < c || d < a) {
+        return -1
+    } else {
+        if (a < c) {
+            if (b < d) return b - c
+            return d - c
+
+        } else {
+            if (b < d) return b - a
+            return d - a
+        }
+    }
+
+}
