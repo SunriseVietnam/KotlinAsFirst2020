@@ -3,10 +3,8 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
-import java.util.function.Function
 import kotlin.math.abs
 import kotlin.math.sqrt
-import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
