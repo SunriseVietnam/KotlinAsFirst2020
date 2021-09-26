@@ -3,8 +3,10 @@
 package lesson3.task1
 
 import lesson1.task1.sqr
+import java.util.function.Function
 import kotlin.math.abs
 import kotlin.math.sqrt
+import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
@@ -202,6 +204,21 @@ fun sin(x: Double, eps: Double): Double = TODO()
  */
 fun cos(x: Double, eps: Double): Double = TODO()
 
+
+
+/**
+ * Логика выделения последней цифры
+ */
+fun sequenceDigit(num: Int, len: Int): Int {
+    var n = num
+    var lenOfLastNum = digitNumber(num)
+    while (len != lenOfLastNum) {
+        --lenOfLastNum
+        n /= 10
+    }
+    return n % 10
+}
+
 /**
  * Сложная (4 балла)
  *
@@ -220,12 +237,7 @@ fun squareSequenceDigit(n: Int): Int {
         ++num
         numSqr = sqr(num)
     }
-    var lenOfLastNum = digitNumber(numSqr)
-    while (len != lenOfLastNum) {
-        --lenOfLastNum
-        numSqr /= 10
-    }
-    return numSqr % 10
+    return sequenceDigit(numSqr, len)
 }
 
 /**
@@ -246,10 +258,5 @@ fun fibSequenceDigit(n: Int): Int {
         ++num
         numFib = fib(num)
     }
-    var lenOfLastNum = digitNumber(numFib)
-    while (len != lenOfLastNum) {
-        --lenOfLastNum
-        numFib /= 10
-    }
-    return numFib % 10
+    return sequenceDigit(numFib, len)
 }
