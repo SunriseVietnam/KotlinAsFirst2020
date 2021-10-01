@@ -244,10 +244,68 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
 fun roman(n: Int): String = TODO()
 
 /**
+ * Запись натурального числа от 1 до 999 прописью по-русски
+ */
+fun russianUnderThousand(n: Int): String {
+    val digits = listOf("один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    val hundreds = (n - n % 100) / 100
+    var units = n % 10
+    val dozens = (n % 100 - n % 10) / 10
+    val strOfHundreds: String = when (hundreds) {
+        0 -> ""
+        1 -> "сто"
+        2 -> "двести"
+        3, 4 -> digits[hundreds - 1] + "ста"
+        else -> digits[hundreds - 1] + "сот"
+    }
+    val strOfDozens: String = when (dozens) {
+        0 -> ""
+        1 -> when (units) {
+            0 -> "десять"
+            1, 3 -> digits[units - 1] + "надцать"
+            2 -> "двенадцать"
+            else -> digits[units - 1].substring(0, digits[units - 1].length - 1) + "надцать"
+        }
+        2, 3 -> digits[dozens - 1] + "дцать"
+        4 -> "сорок"
+        9 -> "девяносто"
+        else -> digits[dozens - 1] + "десят"
+    }
+    if (dozens == 1) units = 0
+    val strOfUnits: String = when (units) {
+        0 -> ""
+        else -> digits[units - 1]
+    }
+    if (hundreds == 0 && dozens == 0) return strOfUnits
+    if (dozens == 0 && units == 0) return strOfHundreds
+    if (units == 0 && hundreds == 0) return strOfDozens
+    if (hundreds == 0) return "$strOfDozens $strOfUnits"
+    if (dozens == 0) return "$strOfHundreds $strOfUnits"
+    if (units == 0) return "$strOfHundreds $strOfDozens"
+    return "$strOfHundreds $strOfDozens $strOfUnits"
+}
+
+/**
  * Очень сложная (7 баллов)
  *
  * Записать заданное натуральное число 1..999999 прописью по-русски.
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+    val underThousand = n % 1000
+    val overThousand = (n - underThousand) / 1000
+    val secondPart: String = russianUnderThousand(underThousand)
+    if (overThousand == 0) return secondPart
+    var firstPart: String = russianUnderThousand(overThousand)
+    if (overThousand % 100 in 11..19) {
+        firstPart += " тысяч"
+    } else firstPart = when (overThousand % 10) {
+        1 -> firstPart.substring(0, firstPart.length - 2) + "на тысяча"
+        2 -> firstPart.substring(0, firstPart.length - 1) + "е тысячи"
+        3, 4 -> "$firstPart тысячи"
+        else -> "$firstPart тысяч"
+    }
+    if (secondPart.isEmpty()) return firstPart
+    return firstPart + " " + russianUnderThousand(underThousand)
+}
