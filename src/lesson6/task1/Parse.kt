@@ -178,15 +178,19 @@ fun mostExpensive(description: String): String = TODO()
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    if (roman == "Z") return -1
     var ans = 0
     var prevChar = 'M'
     val symbols: Map<Char, Int> = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
-    for (i in roman) {
-        if (symbols[prevChar]!! < symbols[i]!!) ans -= 2 * symbols[prevChar]!!
-        ans += symbols[i]!!
-        prevChar = i
+    try {
+        for (i in roman) {
+            if (symbols[prevChar]!! < symbols[i]!!) ans -= 2 * symbols[prevChar]!!
+            ans += symbols[i]!!
+            prevChar = i
+        }
+    } catch (e: NullPointerException) {
+        return -1
     }
+
     if (roman(ans) == roman) return ans
     return -1
 }
