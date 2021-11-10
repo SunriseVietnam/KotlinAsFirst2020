@@ -3,6 +3,7 @@
 package lesson6.task1
 
 import lesson4.task1.roman
+import java.util.Collections.max
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
@@ -164,7 +165,21 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    return try {
+        val mas = description.split(" ", "; ")
+        val products = mutableMapOf<Double, String>()
+        var i = 0
+        while (i < mas.size - 1) {
+
+            products[mas[i + 1].toDouble()] = mas[i]
+            i += 2
+        }
+        return products[max(products.keys)]!!
+    } catch (e: Exception) {
+        ""
+    }
+}
 
 /**
  * Сложная (6 баллов)
@@ -179,7 +194,7 @@ fun mostExpensive(description: String): String = TODO()
  */
 fun fromRoman(roman: String): Int {
     var ans = 0
-    val symbols: Map<Char, Int> = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
+    val symbols = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
     try {
         var prevChar = roman[0]
         for (i in roman) {
