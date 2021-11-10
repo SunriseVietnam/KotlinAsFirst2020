@@ -179,15 +179,15 @@ fun mostExpensive(description: String): String = TODO()
  */
 fun fromRoman(roman: String): Int {
     var ans = 0
-    var prevChar = 'M'
     val symbols: Map<Char, Int> = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
     try {
+        var prevChar = roman[0]
         for (i in roman) {
             if (symbols[prevChar]!! < symbols[i]!!) ans -= 2 * symbols[prevChar]!!
             ans += symbols[i]!!
             prevChar = i
         }
-    } catch (e: NullPointerException) {
+    } catch (e: Exception) {
         return -1
     }
 
