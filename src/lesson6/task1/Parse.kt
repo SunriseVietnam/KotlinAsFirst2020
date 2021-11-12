@@ -166,19 +166,16 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * Все цены должны быть больше нуля либо равны нулю.
  */
 fun mostExpensive(description: String): String {
-    return try {
-        val mas = description.split(" ", "; ")
-        val products = mutableMapOf<Double, String>()
-        var i = 0
-        while (i < mas.size - 1) {
-
-            products[mas[i + 1].toDouble()] = mas[i]
-            i += 2
-        }
-        return products[max(products.keys)]!!
-    } catch (e: Exception) {
-        ""
+    val matchResult = Regex("""(.* (\d)+(\.\d)?(; )?)+""").matches(description)
+    if (!matchResult) return ""
+    val mas = description.split("; ")
+    val products = mutableMapOf<Double, String>()
+    for (i in mas) {
+        val product = i.split(" ")
+        val cost: Double = product[1].toDouble()
+        products[cost] = product[0]
     }
+    return products[max(products.keys)]!!
 }
 
 /**
@@ -193,19 +190,16 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
+    val matchResult = Regex("""[IVXLCDM]+""").matches(roman)
+    if (!matchResult) return -1
     var ans = 0
     val symbols = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
-    try {
-        var prevChar = roman[0]
-        for (i in roman) {
-            if (symbols[prevChar]!! < symbols[i]!!) ans -= 2 * symbols[prevChar]!!
-            ans += symbols[i]!!
-            prevChar = i
-        }
-    } catch (e: Exception) {
-        return -1
+    var prevChar = roman[0]
+    for (i in roman) {
+        if (symbols[prevChar]!! < symbols[i]!!) ans -= 2 * symbols[prevChar]!!
+        ans += symbols[i]!!
+        prevChar = i
     }
-
     if (roman(ans) == roman) return ans
     return -1
 }
