@@ -172,7 +172,7 @@ fun mostExpensive(description: String): String {
     val products = mutableMapOf<Double, String>()
     for (i in mas) {
         val product = i.split(" ")
-        val cost: Double = product[1].toDouble()
+        val cost = product[1].toDouble()
         products[cost] = product[0]
     }
     return products[max(products.keys)]!!
