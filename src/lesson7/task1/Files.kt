@@ -302,7 +302,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         }
     }
     var ans = ""
-    var temp = text.split(Regex("""\n(\n)+"""))
+    var temp = text.split("""\n\n""")
     for (i in temp) ans += "<p>${i}</p>"
     ans = stringParsing(ans, "**", "b")
     ans = stringParsing(ans, "*", "i")
