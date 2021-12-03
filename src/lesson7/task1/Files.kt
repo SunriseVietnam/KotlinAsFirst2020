@@ -295,26 +295,21 @@ fun stringParsing(editStr: String, first: String, second: String): String {
 }
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var text = ""
-    val arrText: MutableList<String> = mutableListOf()
     File(inputName).forEachLine {
         var str = stringParsing(it, "**", "b")
         str = stringParsing(str, "*", "i")
         str = stringParsing(str, "~~", "s")
         text += str
-        if (it.isEmpty()) {
-            arrText.add(text)
-            text = ""
-        }
     }
-    arrText.add(text)
-    text = ""
-    if (arrText.size > 1) {
-        for (i in arrText) text += "<p>${i}</p>"
+    val temp = text.split("""\n\n""", """\t""")
+    var ans = ""
+    if (temp.size > 1) {
+        for (i in temp) ans += "<p>${i}</p>"
     } else {
-        text = arrText[0]
+        ans = temp[0]
     }
     File(outputName).bufferedWriter().use {
-        it.write("<html><body>${text}</body></html>")
+        it.write("<html><body>${ans}</body></html>")
     }
 }
 
