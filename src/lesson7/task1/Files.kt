@@ -281,8 +281,41 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+fun stringParsing(editStr: String, first: String, second: String): String {
+    val temp = editStr.split(first)
+    var str = temp[0]
+    if (temp.size > 1) {
+        str += "<${second}>"
+        for (i in 1 until temp.size - 1) {
+            str += if (i % 2 == 0) "${temp[i]}<${second}>" else "${temp[i]}</${second}>"
+        }
+        str += temp[temp.size - 1]
+    }
+    return str
+}
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    var text = ""
+    val arrText: MutableList<String> = mutableListOf()
+    File(inputName).forEachLine {
+        var str = stringParsing(it, "**", "b")
+        str = stringParsing(str, "*", "i")
+        str = stringParsing(str, "~~", "s")
+        text += str
+        if (it.isEmpty()) {
+            arrText.add(text)
+            text = ""
+        }
+    }
+    arrText.add(text)
+    text = ""
+    if (arrText.size > 1) {
+        for (i in arrText) text += "<p>${i}</p>"
+    } else {
+        text = arrText[0]
+    }
+    File(outputName).bufferedWriter().use {
+        it.write("<html><body>${text}</body></html>")
+    }
 }
 
 /**
