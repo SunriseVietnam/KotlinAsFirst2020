@@ -287,7 +287,11 @@ fun stringParsing(editStr: String, first: String, second: String): String {
     if (temp.size > 1) {
         str += "<${second}>"
         for (i in 1 until temp.size - 1) {
-            str += if (i % 2 == 0) """${temp[i]}<${second}>""" else """${temp[i]}</${second}>"""
+            str += if (i % 2 == 0) {
+                "${temp[i]}<${second}>"
+            } else {
+                "${temp[i]}</${second}>"
+            }
         }
         str += temp[temp.size - 1]
     }
@@ -301,9 +305,22 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             text += """\n\n"""
         }
     }
-    var ans = ""
-    var temp = text.split("""\n\n""")
-    for (i in temp) ans += "<p>${i}</p>"
+    var temp = text.split("""\n""")
+    var ans = temp[0]
+    for (i in 1 until temp.size) {
+        if (temp[i] == " " || temp[i] == """\t""") {
+            ans += """\n"""
+        } else {
+            ans += """\n${temp[i]}"""
+        }
+    }
+    temp = ans.split("""\n\n""")
+    ans = ""
+    for (i in temp) {
+        if (i.isNotEmpty()) {
+            ans += "<p>${i}</p>"
+        }
+    }
     ans = stringParsing(ans, "**", "b")
     ans = stringParsing(ans, "*", "i")
     ans = stringParsing(ans, "~~", "s")
