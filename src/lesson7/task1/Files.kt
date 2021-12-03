@@ -297,16 +297,21 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var text = ""
     File(inputName).forEachLine {
         text += it
-        if (it.isEmpty()) text += """\n\n"""
+        if (it.isEmpty()) {
+            text += """\n\n"""
+        }
     }
-    val temp = text.split(Regex("""\n(\n)+"""))
     var ans = ""
+    var temp = text.split("""\n\n""")
     for (i in temp) ans += "<p>${i}</p>"
     ans = stringParsing(ans, "**", "b")
     ans = stringParsing(ans, "*", "i")
     ans = stringParsing(ans, "~~", "s")
-    ans = ans.replace("""\n""", "")
-    ans = ans.replace("""\t""", "")
+    temp = ans.split("""\\""")
+    ans = temp[0].replace("""\t""", "").replace("""\n""", "")
+    for (i in 1 until temp.size) {
+        ans += """\\${temp[i].replace("""\t""", "").replace("""\n""", "")}"""
+    }
     File(outputName).bufferedWriter().use {
         it.write("<html><body>${ans}</body></html>")
     }
