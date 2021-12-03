@@ -296,10 +296,7 @@ fun stringParsing(editStr: String, first: String, second: String): String {
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var text = ""
     File(inputName).forEachLine {
-        var str = stringParsing(it, "**", "b")
-        str = stringParsing(str, "*", "i")
-        str = stringParsing(str, "~~", "s")
-        text += str
+        text += it
     }
     val temp = text.split("""\n\n""", """\t""")
     var ans = ""
@@ -308,6 +305,9 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     } else {
         ans = temp[0]
     }
+    ans = stringParsing(ans, "**", "b")
+    ans = stringParsing(ans, "*", "i")
+    ans = stringParsing(ans, "~~", "s")
     File(outputName).bufferedWriter().use {
         it.write("<html><body>${ans}</body></html>")
     }
