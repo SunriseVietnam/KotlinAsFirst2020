@@ -287,7 +287,7 @@ fun stringParsing(editStr: String, first: String, second: String): String {
     if (temp.size > 1) {
         str += "<${second}>"
         for (i in 1 until temp.size - 1) {
-            str += if (i % 2 == 0) "${temp[i]}<${second}>" else "${temp[i]}</${second}>"
+            str += if (i % 2 == 0) """${temp[i]}<${second}>""" else """${temp[i]}</${second}>"""
         }
         str += temp[temp.size - 1]
     }
@@ -302,18 +302,18 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         }
     }
     var ans = ""
-    var temp = text.split("""\n\n""")
+    var temp = text.split(Regex("""\n(\n)+"""))
     for (i in temp) ans += "<p>${i}</p>"
     ans = stringParsing(ans, "**", "b")
     ans = stringParsing(ans, "*", "i")
     ans = stringParsing(ans, "~~", "s")
-    temp = ans.split("""\\""")
+    temp = ans.split("\\\\")
     ans = temp[0].replace("""\t""", "").replace("""\n""", "")
     for (i in 1 until temp.size) {
         ans += """\\${temp[i].replace("""\t""", "").replace("""\n""", "")}"""
     }
     File(outputName).bufferedWriter().use {
-        it.write("<html><body>${ans}</body></html>")
+        it.write("""<html><body>${ans}</body></html>""")
     }
 }
 
