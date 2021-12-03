@@ -297,6 +297,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
     var text = ""
     File(inputName).forEachLine {
         text += it
+        if (it.isEmpty()) text += """\t"""
     }
     val temp = text.split("""\n\n""", """\t""")
     var ans = ""
