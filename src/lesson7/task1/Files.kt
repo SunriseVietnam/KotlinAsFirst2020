@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import kotlin.math.max
 import kotlin.math.pow
 
 // Урок 7: работа с файлами
@@ -540,6 +541,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             1 -> arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - subArray[j].length) + subArray[j]
             else -> {
                 arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - subArray[j].length) + "-".repeat(subArray[j].length)
+                if (i == n - 2 && subArray[j].length < remArray[j].length) arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - remArray[j].length) + "-".repeat(remArray[j].length)
                 ++j
             }
         }
