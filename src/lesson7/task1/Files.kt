@@ -488,54 +488,64 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
   19935 | 22
  -198     906
  ----
-    13
-    -0
+    13 remArray[0]
+    -0 subArray[1]
     --
-    135
-   -132
+    135 remArray[1]
+   -132 subArray[2]
    ----
-      3
+      3 remArray[2]
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    val dhv = lhv / rhv
-    val res = lhv % rhv
-    val listOfStr1 = mutableListOf<Int>()
-    val listOfStr2 = mutableListOf<Int>()
-    var temp = dhv
-    listOfStr1.add((temp % 10) * rhv)
-    listOfStr2.add(listOfStr1[0] + res)
-    temp /= 10
-    while (temp > 0) {
-        val t = (temp % 10) * rhv
-        listOfStr1.add(t)
-        temp /= 10
-        listOfStr2.add(listOfStr2.last() / 10 - listOfStr1.last())
+    val dhv = (lhv / rhv).toString()
+    val lhvString = lhv.toString()
+    val lenOfDhv = dhv.length
+    val lenOfLhv = lhvString.length
+    val subArray: MutableList<String> = mutableListOf() // массив вычитаний
+    for (i in dhv) subArray.add("-${i.toString().toInt() * rhv}")
+    val remArray: MutableList<String> = mutableListOf() // массив остатков
+    val spaceArray: MutableList<Int> = mutableListOf() // массив числа пробелов
+    var numRank = subArray[0].length // движение по разряду делимого
+    var remain = lhvString.take(numRank - 1).toInt() + subArray[0].toInt() // первый остаток
+    if (numRank > lhvString.length) { // если разряд совпадает с разрядом единиц, то к остатку не приписывается справа цифра
+        remArray.add(remain.toString())
+        spaceArray.add(subArray[0].length - remArray[0].length)
+    } else {
+        remArray.add(remain.toString() + lhvString[numRank - 1].toString())
+        remain = remArray[0].toInt()
     }
-    val size = listOfStr1.size - 1
-    listOfStr2[size] += 2 * listOfStr1.last()
-    var i = size
-    var baseSpace = 0
-    println(" $lhv | $rhv")
-    while (i >= 0) {
-        val lenOfSub = listOfStr1[i].toString().length
-        val spaceDiff = listOfStr2[i].toString().length - lenOfSub
-        if (i == size) {
-            println("-${listOfStr1[i]}" + " ".repeat(" $lhv | ".length - lenOfSub - 1) + dhv)
-            println(" ".repeat(baseSpace) + "-".repeat(lenOfSub + 1))
-        } else {
-            println(" ".repeat(baseSpace) + listOfStr2[i])
-            println(" ".repeat(baseSpace + spaceDiff - 1) + "-${listOfStr1[i]}")
-            println(" ".repeat(baseSpace + spaceDiff - 1) + "-".repeat(lenOfSub + 1))
+    spaceArray.add(subArray[0].length - remArray[0].length + 1) // первый отступ
+    for (i in 1 until dhv.length) {
+        ++numRank
+        remain += subArray[i].toInt() // вычитание
+        if (numRank <= lhvString.length) {
+            remArray.add(remain.toString() + lhvString[numRank - 1].toString())
+            remain = remArray[i].toInt() // приписывание к остатку справа числа
+        } else remArray.add(remain.toString())
+        spaceArray.add(spaceArray[i - 1] + remArray[i - 1].length - remArray[i].length + 1)
+        if (numRank > lhvString.length) --spaceArray[i]
+    }
+    val n = lenOfDhv * 3 + 1
+    val arr: Array<String> = Array(n) { "" }
+    arr[0] = " $lhv | $rhv"
+    arr[1] = subArray[0] + " ".repeat(lenOfLhv - subArray[0].length + 4) + dhv
+    arr[2] = "-".repeat(subArray[0].length)
+    var j = 1
+    for (i in 3 until n) {
+        when (i % 3) {
+            0 -> arr[i] = " ".repeat(spaceArray[j - 1]) + remArray[j - 1]
+            1 -> arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - subArray[j].length) + subArray[j]
+            else -> {
+                arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - subArray[j].length) + "-".repeat(subArray[j].length)
+                ++j
+            }
         }
-        baseSpace += lenOfSub - (listOfStr2[i] - listOfStr1[i]).toString().length + 1
-        --i
     }
-    println(" ".repeat(baseSpace - 1) + res)
     File(outputName).bufferedWriter().use {
-        it.write("aaas")
+        it.write(arr.joinToString("\n"))
     }
 }
 
