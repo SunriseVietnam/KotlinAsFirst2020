@@ -492,9 +492,9 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val dhv = (lhv / rhv).toString()
-    val lhvString = lhv.toString()
+    val res = (lhv % rhv).toString()
     val lenOfDhv = dhv.length
-    val lenOfLhv = lhvString.length
+    val lenOfLhv = lhv.toString().length
 
     val subArray: MutableList<String> = mutableListOf() // массив вычитаний с учетом разрядов
     for (i in dhv) subArray.add((i.toString().toInt() * rhv).toString())
@@ -503,15 +503,14 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         if (dhv[i] == '0') subArray2.add("0".repeat(lenOfDhv - i))
         else subArray2.add((subArray[i].toInt() * 10.0.pow(lenOfDhv - 1 - i).toInt()).toString())
     }
-
     val remArray: MutableList<String> = mutableListOf() // массив остатков
-    remArray.add(lhvString)
+    remArray.add("0$lhv")
     for (i in 1 until lenOfDhv + 1) {
         val r = remArray[i - 1].toInt() - subArray2[i - 1].toInt()
-        if (remArray[i - 1].trimStart('0').take(subArray[i - 1].length).toInt() - subArray[i - 1].toInt() == 0) remArray.add("0$r")
+        val t = remArray[i - 1].trimStart('0').take(subArray[i - 1].length).toInt() - subArray[i - 1].toInt()
+        if (t == 0 || t == remArray[i - 1].toInt()) remArray.add("0${remArray[i - 1].substring(subArray[i - 1].length + 1)}")
         else remArray.add(r.toString())
     }
-
     val arr = mutableListOf<String>()
     val firstSpaceNum = if (subArray2[0].length + 1 - lenOfLhv > 0) subArray2[0].length + 1 - lenOfLhv else 0
     for (i in 0 until lenOfDhv) {
@@ -522,12 +521,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             arr.add(" ".repeat(lenOfLhv + firstSpaceNum - remArray[i].length) + remArray[i].take(subArray[i].length + 1))
             arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-${subArray[i]}")
         }
-        if (i == lenOfDhv - 1 && remArray[i].length > subArray2[i].length + 1) {
-            arr.add(" ".repeat(lenOfLhv - remArray[i].length) + "-".repeat(remArray[i].length))
-        } else {
-            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-".repeat(subArray[i].length + 1))
-        }
+        if (i == lenOfDhv - 1) break
+        arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-".repeat(subArray[i].length + 1))
     }
+    if (res.length > subArray2[lenOfDhv - 1].length + 1) arr.add(" ".repeat(lenOfLhv - res.length) + "-".repeat(res.length))
+    else arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[lenOfDhv - 1].length) + "-".repeat(subArray[lenOfDhv - 1].length + 1))
     if (remArray[lenOfDhv].toInt() != 0) arr.add(" ".repeat(lenOfLhv + firstSpaceNum - remArray[lenOfDhv].trimStart('0').length) + remArray[lenOfDhv].trimStart('0'))
     else arr.add(" ".repeat(firstSpaceNum + lenOfLhv - 1) + 0)
     File(outputName).bufferedWriter().use {
