@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -283,57 +284,46 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun stringParsing(editStr: String, first: String, second: String): String {
-    val temp = editStr.split(first)
-    var str = temp[0]
-    if (temp.size > 1) {
-        str += "<${second}>"
-        for (i in 1 until temp.size - 1) {
-            str += if (i % 2 == 0) {
-                "${temp[i]}<${second}>"
-            } else {
-                "${temp[i]}</${second}>"
-            }
-        }
-        str += temp[temp.size - 1]
+fun stringParsing(marks: Stack<String>, parse: String): String {
+    return if (marks.isNotEmpty() && marks.peek() == parse) {
+        marks.pop()
+        "</$parse>"
+    } else {
+        marks.push(parse)
+        "<$parse>"
     }
-    return str
 }
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    var text = ""
+    val marks = Stack<String>()
+    var ans = ""
+    var flag = false
     File(inputName).forEachLine {
-        text += it
-        if (it.isEmpty()) {
-            text += """\n\n"""
+        if (it.isBlank() && ans.isNotBlank()) flag = true
+        else {
+            if (flag) {
+                ans += "</p><p>"
+                flag = false
+            }
+            var i = 0
+            val s = "$it "
+            while (i < s.length - 1) {
+                val c = s[i]
+                if (c == '*') {
+                    if (s[i + 1] == '*') {
+                        ans += stringParsing(marks, "b")
+                        ++i
+                    } else ans += stringParsing(marks, "i")
+                } else if (c == '~' && s[i + 1] == '~') {
+                    ans += stringParsing(marks, "s")
+                    ++i
+                } else ans += c
+                ++i
+            }
         }
-    }
-    var temp = text.split("""\n""")
-    var ans = temp[0]
-    for (i in 1 until temp.size) {
-        if (temp[i] == " " || temp[i] == """\t""") {
-            ans += """\n"""
-        } else {
-            ans += """\n${temp[i]}"""
-        }
-    }
-    temp = ans.split("""\n\n""")
-    ans = ""
-    for (i in temp) {
-        if (i.isNotEmpty()) {
-            ans += "<p>${i}</p>"
-        }
-    }
-    ans = stringParsing(ans, "**", "b")
-    ans = stringParsing(ans, "*", "i")
-    ans = stringParsing(ans, "~~", "s")
-    temp = ans.split("\\\\")
-    ans = temp[0].replace("""\t""", "").replace("""\n""", "")
-    for (i in 1 until temp.size) {
-        ans += """\\${temp[i].replace("""\t""", "").replace("""\n""", "")}"""
     }
     File(outputName).bufferedWriter().use {
-        it.write("<html><body>${ans}</body></html>")
+        it.write("<html><body><p>$ans</p></body></html>")
     }
 }
 
@@ -456,14 +446,14 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
 235
@@ -505,47 +495,41 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val lhvString = lhv.toString()
     val lenOfDhv = dhv.length
     val lenOfLhv = lhvString.length
-    val subArray: MutableList<String> = mutableListOf() // массив вычитаний
-    for (i in dhv) subArray.add("-${i.toString().toInt() * rhv}")
+
+    val subArray: MutableList<String> = mutableListOf() // массив вычитаний с учетом разрядов
+    for (i in dhv) subArray.add((i.toString().toInt() * rhv).toString())
+    val subArray2: MutableList<String> = mutableListOf() // массив вычитаний
+    for (i in 0 until lenOfDhv) {
+        if (dhv[i] == '0') subArray2.add("0".repeat(lenOfDhv - i))
+        else subArray2.add((subArray[i].toInt() * 10.0.pow(lenOfDhv - 1 - i).toInt()).toString())
+    }
+
     val remArray: MutableList<String> = mutableListOf() // массив остатков
-    val spaceArray: MutableList<Int> = mutableListOf() // массив числа пробелов
-    var numRank = subArray[0].length // движение по разряду делимого
-    var remain = lhvString.take(numRank - 1).toInt() + subArray[0].toInt() // первый остаток
-    if (numRank > lhvString.length) { // если разряд совпадает с разрядом единиц, то к остатку не приписывается справа цифра
-        remArray.add(remain.toString())
-        spaceArray.add(subArray[0].length - remArray[0].length)
-    } else {
-        remArray.add(remain.toString() + lhvString[numRank - 1].toString())
-        remain = remArray[0].toInt()
+    remArray.add(lhvString)
+    for (i in 1 until lenOfDhv + 1) {
+        val r = remArray[i - 1].toInt() - subArray2[i - 1].toInt()
+        if (remArray[i - 1].trimStart('0').take(subArray[i - 1].length).toInt() - subArray[i - 1].toInt() == 0) remArray.add("0$r")
+        else remArray.add(r.toString())
     }
-    spaceArray.add(subArray[0].length - remArray[0].length + 1) // первый отступ
-    for (i in 1 until dhv.length) {
-        ++numRank
-        remain += subArray[i].toInt() // вычитание
-        if (numRank <= lhvString.length) {
-            remArray.add(remain.toString() + lhvString[numRank - 1].toString())
-            remain = remArray[i].toInt() // приписывание к остатку справа числа
-        } else remArray.add(remain.toString())
-        spaceArray.add(spaceArray[i - 1] + remArray[i - 1].length - remArray[i].length + 1)
-        if (numRank > lhvString.length) --spaceArray[i]
-    }
-    val n = lenOfDhv * 3 + 1
-    val arr: Array<String> = Array(n) { "" }
-    arr[0] = " $lhv | $rhv"
-    arr[1] = subArray[0] + " ".repeat(lenOfLhv - subArray[0].length + 4) + dhv
-    arr[2] = "-".repeat(subArray[0].length)
-    var j = 1
-    for (i in 3 until n) {
-        when (i % 3) {
-            0 -> arr[i] = " ".repeat(spaceArray[j - 1]) + remArray[j - 1]
-            1 -> arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - subArray[j].length) + subArray[j]
-            else -> {
-                arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - subArray[j].length) + "-".repeat(subArray[j].length)
-                if (i == n - 2 && subArray[j].length < remArray[j].length) arr[i] = " ".repeat(spaceArray[j - 1] + remArray[j - 1].length - remArray[j].length) + "-".repeat(remArray[j].length)
-                ++j
-            }
+
+    val arr = mutableListOf<String>()
+    val firstSpaceNum = if (subArray2[0].length + 1 - lenOfLhv > 0) subArray2[0].length + 1 - lenOfLhv else 0
+    for (i in 0 until lenOfDhv) {
+        if (i == 0) {
+            arr.add(" ".repeat(firstSpaceNum) + "$lhv | $rhv")
+            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-${subArray[i]}" + " ".repeat(subArray2[i].length - subArray[i].length + 3) + dhv)
+        } else {
+            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - remArray[i].length) + remArray[i].take(subArray[i].length + 1))
+            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-${subArray[i]}")
+        }
+        if (i == lenOfDhv - 1 && remArray[i].length > subArray2[i].length + 1) {
+            arr.add(" ".repeat(lenOfLhv - remArray[i].length) + "-".repeat(remArray[i].length))
+        } else {
+            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-".repeat(subArray[i].length + 1))
         }
     }
+    if (remArray[lenOfDhv].toInt() != 0) arr.add(" ".repeat(lenOfLhv + firstSpaceNum - remArray[lenOfDhv].trimStart('0').length) + remArray[lenOfDhv].trimStart('0'))
+    else arr.add(" ".repeat(firstSpaceNum + lenOfLhv - 1) + 0)
     File(outputName).bufferedWriter().use {
         it.write(arr.joinToString("\n"))
     }
