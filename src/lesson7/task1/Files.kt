@@ -4,7 +4,6 @@ package lesson7.task1
 
 import java.io.File
 import java.util.*
-import kotlin.math.max
 import kotlin.math.pow
 
 // Урок 7: работа с файлами
@@ -519,18 +518,19 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             arr.add(" ".repeat(firstSpaceNum) + "$lhv | $rhv")
             arr.add(sp + subArray[i] + " ".repeat(subArray2[i].length - subArray[i].length + 4) + dhv)
         } else {
-            val s = remArray[i].substring(lenOfLhv - subArray2[i].length).take(subArray[i].length - 1)
-            val sZeroless = s.trimStart('0')
-            if (sZeroless.length > 1) arr.add(sp + " ".repeat(s.length - sZeroless.length + 1) + sZeroless)
-            else arr.add(sp + remArray[i].substring(lenOfLhv - subArray2[i].length - 1).take(subArray[i].length))
+            val z = remArray[i].trimStart('0')
+            if (remArray[i].take(lenOfLhv - subArray2[i].length).trim('0').isEmpty() && subArray[i].length == 2) {
+                arr.add(sp + remArray[i].substring(lenOfLhv - subArray2[i].length - 1).take(subArray[i].length))
+            } else arr.add(" ".repeat(lenOfLhv + firstSpaceNum - z.length) + z.take(z.length - (subArray2[i].length - subArray[i].length + 1)))
             arr.add(sp + subArray[i])
         }
         if (i == lenOfDhv - 1) break
         arr.add(sp + "-".repeat(subArray[i].length))
     }
-    if (res.length > subArray2[lenOfDhv - 1].length + 1) arr.add(" ".repeat(lenOfLhv - res.length) + "-".repeat(res.length))
+    if (res.length > subArray2[lenOfDhv - 1].length + 1) arr.add(" ".repeat(lenOfLhv + firstSpaceNum - res.length) + "-".repeat(res.length))
     else arr.add(" ".repeat(lenOfLhv + firstSpaceNum - subArray2[lenOfDhv - 1].length - 1) + "-".repeat(subArray[lenOfDhv - 1].length))
     arr.add(" ".repeat(lenOfLhv + firstSpaceNum - res.length) + res)
+    for (i in arr) println(i)
     File(outputName).bufferedWriter().use {
         it.write(arr.joinToString("\n"))
     }
