@@ -296,13 +296,14 @@ fun stringParsing(marks: Stack<String>, parse: String): String {
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val marks = Stack<String>()
-    var ans = ""
+    val ans = StringBuilder()
     var flag = false
     File(inputName).forEachLine {
-        if (it.isBlank() && ans.isNotBlank()) flag = true
-        else {
+        if (it.isBlank() && ans.toString().isNotBlank()) {
+            flag = true
+        } else {
             if (flag) {
-                ans += "</p><p>"
+                ans.append("</p><p>")
                 flag = false
             }
             var i = 0
@@ -311,19 +312,19 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
                 val c = s[i]
                 if (c == '*') {
                     if (s[i + 1] == '*') {
-                        ans += stringParsing(marks, "b")
+                        ans.append(stringParsing(marks, "b"))
                         ++i
-                    } else ans += stringParsing(marks, "i")
+                    } else ans.append(stringParsing(marks, "i"))
                 } else if (c == '~' && s[i + 1] == '~') {
-                    ans += stringParsing(marks, "s")
+                    ans.append(stringParsing(marks, "s"))
                     ++i
-                } else ans += c
+                } else ans.append(c)
                 ++i
             }
         }
     }
     File(outputName).bufferedWriter().use {
-        it.write("<html><body><p>$ans</p></body></html>")
+        it.write("<html><body><p>${ans}</p></body></html>")
     }
 }
 
@@ -479,13 +480,13 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
   19935 | 22
  -198     906
  ----
-    13 remArray[0]
-    -0 subArray[1]
+    13
+    -0
     --
-    135 remArray[1]
-   -132 subArray[2]
+    135
+   -132
    ----
-      3 remArray[2]
+      3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
@@ -497,37 +498,39 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val lenOfLhv = lhv.toString().length
 
     val subArray: MutableList<String> = mutableListOf() // массив вычитаний с учетом разрядов
-    for (i in dhv) subArray.add((i.toString().toInt() * rhv).toString())
+    for (i in dhv) subArray.add("-${(i.toString().toInt() * rhv)}")
     val subArray2: MutableList<String> = mutableListOf() // массив вычитаний
     for (i in 0 until lenOfDhv) {
-        if (dhv[i] == '0') subArray2.add("0".repeat(lenOfDhv - i))
-        else subArray2.add((subArray[i].toInt() * 10.0.pow(lenOfDhv - 1 - i).toInt()).toString())
+        if (dhv[i] == '0') subArray2.add("-" + "0".repeat(lenOfDhv - i))
+        else subArray2.add("-${(-subArray[i].toInt() * 10.0.pow(lenOfDhv - 1 - i).toInt())}")
     }
     val remArray: MutableList<String> = mutableListOf() // массив остатков
-    remArray.add("0$lhv")
-    for (i in 1 until lenOfDhv + 1) {
-        val r = remArray[i - 1].toInt() - subArray2[i - 1].toInt()
-        val t = remArray[i - 1].trimStart('0').take(subArray[i - 1].length).toInt() - subArray[i - 1].toInt()
-        if (t == 0 || t == remArray[i - 1].toInt()) remArray.add("0${remArray[i - 1].substring(subArray[i - 1].length + 1)}")
-        else remArray.add(r.toString())
+    remArray.add(lhv.toString())
+    for (i in 1 until lenOfDhv) {
+        val r = remArray[i - 1].toInt() + subArray2[i - 1].toInt()
+        remArray.add("0".repeat(lenOfLhv - r.toString().length) + r)
     }
     val arr = mutableListOf<String>()
-    val firstSpaceNum = if (subArray2[0].length + 1 - lenOfLhv > 0) subArray2[0].length + 1 - lenOfLhv else 0
+    val firstSpaceNum = if (subArray2[0].length - lenOfLhv > 0) subArray2[0].length - lenOfLhv else 0
     for (i in 0 until lenOfDhv) {
+        val sp = " ".repeat(lenOfLhv + firstSpaceNum - subArray2[i].length)
         if (i == 0) {
             arr.add(" ".repeat(firstSpaceNum) + "$lhv | $rhv")
-            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-${subArray[i]}" + " ".repeat(subArray2[i].length - subArray[i].length + 3) + dhv)
+            arr.add(sp + subArray[i] + " ".repeat(subArray2[i].length - subArray[i].length + 3) + dhv)
         } else {
-            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - remArray[i].length) + remArray[i].take(subArray[i].length + 1))
-            arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-${subArray[i]}")
+            val s = remArray[i].substring(lenOfLhv - subArray2[i].length).take(subArray[i].length)
+            val sZeroless = s.trimStart('0')
+            if (sZeroless.length > 1) arr.add(sp + " ".repeat(s.length - sZeroless.length) + s.trimStart('0'))
+            else arr.add(sp + s)
+            arr.add(sp + subArray[i])
         }
         if (i == lenOfDhv - 1) break
-        arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[i].length) + "-".repeat(subArray[i].length + 1))
+        arr.add(sp + "-".repeat(subArray[i].length))
     }
-    if (res.length > subArray2[lenOfDhv - 1].length + 1) arr.add(" ".repeat(lenOfLhv - res.length) + "-".repeat(res.length))
-    else arr.add(" ".repeat(lenOfLhv + firstSpaceNum - 1 - subArray2[lenOfDhv - 1].length) + "-".repeat(subArray[lenOfDhv - 1].length + 1))
-    if (remArray[lenOfDhv].toInt() != 0) arr.add(" ".repeat(lenOfLhv + firstSpaceNum - remArray[lenOfDhv].trimStart('0').length) + remArray[lenOfDhv].trimStart('0'))
-    else arr.add(" ".repeat(firstSpaceNum + lenOfLhv - 1) + 0)
+    if (res.length > subArray2[lenOfDhv - 1].length) arr.add(" ".repeat(lenOfLhv - res.length) + "-".repeat(res.length))
+    else arr.add(" ".repeat(lenOfLhv + firstSpaceNum - subArray2[lenOfDhv - 1].length) + "-".repeat(subArray[lenOfDhv - 1].length))
+    arr.add(" ".repeat(lenOfLhv + firstSpaceNum - res.length) + res)
+    for (i in arr) println(i)
     File(outputName).bufferedWriter().use {
         it.write(arr.joinToString("\n"))
     }
