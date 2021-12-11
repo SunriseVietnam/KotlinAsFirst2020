@@ -510,6 +510,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         val r = remArray[i - 1].toInt() + subArray2[i - 1].toInt()
         remArray.add("0".repeat(lenOfLhv - r.toString().length) + r)
     }
+
     val arr = mutableListOf<String>()
     val firstSpaceNum = if (subArray2[0].length - lenOfLhv > 0) subArray2[0].length - lenOfLhv else 0
     for (i in 0 until lenOfDhv) {
@@ -530,7 +531,6 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     if (res.length > subArray2[lenOfDhv - 1].length) arr.add(" ".repeat(lenOfLhv - res.length) + "-".repeat(res.length))
     else arr.add(" ".repeat(lenOfLhv + firstSpaceNum - subArray2[lenOfDhv - 1].length) + "-".repeat(subArray[lenOfDhv - 1].length))
     arr.add(" ".repeat(lenOfLhv + firstSpaceNum - res.length) + res)
-    for (i in arr) println(i)
     File(outputName).bufferedWriter().use {
         it.write(arr.joinToString("\n"))
     }
