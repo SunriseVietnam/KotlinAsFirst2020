@@ -146,7 +146,32 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val lines = mutableListOf<List<String>>()
+    var len = 0
+    File(inputName).forEachLine { line ->
+        lines += if (line.isNotBlank()) {
+            line.trim().split(Regex(""" +"""))
+        } else listOf("")
+        val loc = lines.last().joinToString(" ").length
+        if (loc > len) len = loc
+    }
+
+    for ((ind, sepLine) in lines.withIndex()) {
+        val sep = sepLine.toMutableList()
+        var line = sep.joinToString(" ")
+        while (line.length < len && sep.size > 1) {
+            for (index in 0 until sep.lastIndex) {
+                line = sep.joinToString(" ")
+                if (line.length >= len) break
+                sep[index] += " "
+            }
+        }
+        lines[ind] = sep
+    }
+
+    File(outputName).bufferedWriter().use { file ->
+        for (line in lines) file.write(line.joinToString(" ") + "\n")
+    }
 }
 
 /**
@@ -235,7 +260,18 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val chosen = mutableListOf("")
+    File(inputName).forEachLine { w ->
+        val wLow = w.lowercase()
+        if (wLow.all { char -> wLow.count { it == char } == 1 }) {
+            if (w.length == chosen[0].length) chosen += w
+            if (w.length > chosen[0].length) {
+                chosen.clear()
+                chosen += w
+            }
+        }
+    }
+    File(outputName).bufferedWriter().use { it.write(chosen.joinToString()) }
 }
 
 /**
@@ -466,7 +502,20 @@ fun markdownToHtml(inputName: String, outputName: String) {
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use { file ->
+        //val len = lhv.toString().length + rhv.toString().length
+        val len = (lhv * rhv).toString().length + 1
+        file.write(String.format("%${len}d\n*%${len - 1}d\n", lhv, rhv))
+        for (i in 1..len) file.write("-")
+        file.write(String.format("\n%${len}d\n", lhv * (rhv % 10)))
+        if (rhv / 10 != 0) {
+            for ((index, num) in (rhv / 10).toString().reversed().withIndex()) {
+                file.write(String.format("+%${len - index - 2}d\n", (lhv * num.toString().toInt())))
+            }
+        }
+        for (i in 1..len) file.write("-")
+        file.write(String.format("\n%${len}d", lhv * rhv))
+    }
 }
 
 
@@ -535,4 +584,3 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         it.write(arr.joinToString("\n"))
     }
 }
-

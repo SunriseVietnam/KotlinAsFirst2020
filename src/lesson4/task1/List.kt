@@ -120,7 +120,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = TODO()
+fun abs(v: List<Double>): Double = sqrt(v.sumOf { it * it })
 
 /**
  * Простая (2 балла)
@@ -242,19 +242,11 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 fun roman(n: Int): String {
-    val symbolsOfUnits = listOf("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
-    val symbolsOfDozens = listOf("X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
-    val symbolsOfHundreds = listOf("C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
-    var result = ""
-    val thousands = (n - n % 1000) / 1000
-    val hundreds = (n % 1000 - n % 100) / 100
-    val dozens = (n % 100 - n % 10) / 10
-    val units = n % 10
-    for (i in 1..thousands) result += "M"
-    if (hundreds != 0) result += symbolsOfHundreds[hundreds - 1]
-    if (dozens != 0) result += symbolsOfDozens[dozens - 1]
-    if (units != 0) result += symbolsOfUnits[units - 1]
-    return result
+    val one = listOf("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX")
+    val ten = listOf("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC")
+    val hun = listOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")
+    val tho = listOf("", "M", "MM", "MMM")
+    return tho[n / 1000] + hun[n / 100 % 10] + ten[n / 10 % 10] + one[n % 10]
 }
 
 /**

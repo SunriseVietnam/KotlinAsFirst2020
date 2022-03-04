@@ -79,7 +79,6 @@ fun ageDescription(age: Int): String = when (age % 100) {
     }
 }
 
-
 /**
  * Простая (2 балла)
  *
@@ -142,18 +141,14 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
-    if (b < c || d < a) {
-        return -1
-    } else {
-        if (a < c) {
-            if (b < d) return b - c
-            return d - c
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int =
+    if ((c <= b) && (a <= c) && (b <= d)) {
+        b - c
+    } else if ((a <= d) && (c <= a) && (d <= b)) {
+        d - a
+    } else if ((a <= c) && (b >= d)) {
+        d - c
+    } else if ((c <= a) && (d >= b)) {
+        b - a
+    } else -1
 
-        } else {
-            if (b < d) return b - a
-            return d - a
-        }
-    }
-
-}

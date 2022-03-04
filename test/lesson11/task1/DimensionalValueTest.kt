@@ -21,6 +21,8 @@ internal class DimensionalValueTest {
         val second = DimensionalValue("200 m")
         assertEquals(200.0, second.value)
         assertEquals(Dimension.METER, second.dimension)
+        assertThrows(IllegalArgumentException::class.java) { DimensionalValue("100 l") }
+        assertThrows(IllegalArgumentException::class.java) { DimensionalValue("100g") }
     }
 
     @Test

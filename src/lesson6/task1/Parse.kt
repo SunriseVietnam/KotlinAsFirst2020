@@ -4,6 +4,9 @@ package lesson6.task1
 
 import lesson4.task1.roman
 import java.util.Collections.max
+import ru.spbstu.wheels.stack
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
@@ -77,7 +80,38 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    if (!str.matches(Regex("""\d+ ([а-я])+ \d+"""))) return ""
+    val list = str.split(' ')
+    val day = list[0].toInt()
+    var month = list[1]
+    val year = list[2].toInt()
+    val months = mapOf(
+        "января" to "01",
+        "февраля" to "02",
+        "марта" to "03",
+        "апреля" to "04",
+        "мая" to "05",
+        "июня" to "06",
+        "июля" to "07",
+        "августа" to "08",
+        "сентября" to "09",
+        "октября" to "10",
+        "ноября" to "11",
+        "декабря" to "12"
+    )
+    if (month !in months) return "" else month = months[month].toString()
+    return if (isDayCorrect(day, month.toInt(), year))
+        String.format("%02d.%s.%d", day, month, year) else ""
+}
+
+fun isDayCorrect(day: Int, month: Int, year: Int): Boolean {
+    val limits = mutableMapOf<Int, Int>()
+    for (i in listOf(1, 3, 5, 7, 8, 10, 12)) limits += i to 31
+    for (i in listOf(4, 6, 9, 11)) limits += i to 30
+    limits += if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) 2 to 29 else 2 to 28
+    return day in 1..limits[month]!!
+}
 
 /**
  * Средняя (4 балла)
@@ -89,7 +123,28 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    if (!digital.matches(Regex("""\d+\.\d+\.\d+"""))) return ""
+    val (day, month, year) = digital.split('.')
+    val months = mapOf(
+        "01" to "января",
+        "02" to "февраля",
+        "03" to "марта",
+        "04" to "апреля",
+        "05" to "мая",
+        "06" to "июня",
+        "07" to "июля",
+        "08" to "августа",
+        "09" to "сентября",
+        "10" to "октября",
+        "11" to "ноября",
+        "12" to "декабря"
+    )
+    if (month !in months) return ""
+    return if (isDayCorrect(day.toInt(), month.toInt(), year.toInt()))
+        "${day.toInt()} ${months[month].toString()} $year" else ""
+}
+
 
 /**
  * Средняя (4 балла)
@@ -105,7 +160,13 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    val cor = "1234567890()+- "
+    val local = phone.filter { it !in " -" }
+    if (local.count { it in "()" } !in listOf(0, 2)) return ""
+    if (local.any { it !in cor || (it == '(' && !local[local.indexOf(it) + 1].isDigit()) }) return ""
+    return local.filter { it.isDigit() || it == '+' }
+}
 
 /**
  * Средняя (5 баллов)
@@ -139,9 +200,23 @@ fun bestHighJump(jumps: String): Int = TODO()
  * использующее целые положительные числа, плюсы и минусы, разделённые пробелами.
  * Наличие двух знаков подряд "13 + + 10" или двух чисел подряд "1 2" не допускается.
  * Вернуть значение выражения (6 для примера).
- * Про нарушении формата входной строки бросить исключение IllegalArgumentException
+ * При нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    if (expression.contains(Regex("""[+-] [+-]|\d \d|^[+-]""")))
+        throw IllegalArgumentException()
+    val stripped = expression.filter { it != ' ' }
+    val numbers = Regex("[-+]").split(stripped)
+    val move = stripped.filter { it in "-+" }.toList()
+    var total = numbers[0].toInt()
+    for (m in move.indices) {
+        when (move[m]) {
+            '+' -> total += numbers[m + 1].toInt()
+            '-' -> total -= numbers[m + 1].toInt()
+        }
+    }
+    return total
+}
 
 /**
  * Сложная (6 баллов)
@@ -152,7 +227,10 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    val index = Regex("""([!-я]+) \1""").find(str.lowercase())
+    return index?.range?.first ?: -1
+}
 
 /**
  * Сложная (6 баллов)
@@ -240,4 +318,44 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val localList = mutableListOf<Pair<Int, Int>>()
+    val mapBr = mutableMapOf<Int, Int>()
+    val stackBr = stack<Char>()
+    //Brackets check
+    if (commands.any { it !in "<>+-[] " }) throw IllegalArgumentException()
+    for ((index, char) in commands.withIndex()) {
+        if (char == '[') {
+            stackBr.push(char)
+            localList += index to -1
+        }
+        if (char == ']') {
+            if (stackBr.isEmpty()) throw IllegalArgumentException()
+            stackBr.pop()
+            mapBr += localList.last().first to index
+            localList.remove(localList.last())
+        }
+    }
+    if (!stackBr.isEmpty()) throw IllegalArgumentException()
+
+    var lim = limit
+    val line = mutableListOf<Int>()
+    var cart = cells / 2
+    for (i in 1..cells) line += 0
+    var index = 0
+    //Moves
+    while ((index < commands.length) && (lim != 0)) {
+        when (commands[index]) {
+            '>' -> cart++
+            '<' -> cart--
+            '+' -> line[cart]++
+            '-' -> line[cart]--
+            '[' -> if (line[cart] == 0) index = mapBr[index]!!
+            ']' -> if (line[cart] != 0) index = mapBr.filter { it.value == index }.keys.last()
+        }
+        index++
+        lim--
+        if ((cart > cells - 1) || (cart < 0)) throw IllegalStateException()
+    }
+    return line
+}
